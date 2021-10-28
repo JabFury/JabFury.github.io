@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>自定义上传</title>
+    <link href="/2021/10/28/js/buttonForUpload/"/>
+    <url>/2021/10/28/js/buttonForUpload/</url>
+    
+    <content type="html"><![CDATA[<p>在实际开发中，如果产品提出一些点击某些可点击的DOM就触发上传事件等需求时，我们可以自己实现一个自定义上传的方法，甚至也可以封装成组件方便使用。</p><p>UI实现原理也比较简单。最核心的就是隐藏系统上传的dom，通过js的点击事件触发其点击事件。然后为其增添一个change的事件即可获取到上传的文件。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript">&lt;input id=<span class="hljs-string">&quot;uploadBtn&quot;</span> type=<span class="hljs-string">&quot;file&quot;</span> style=<span class="hljs-string">&quot;display: none;&quot;</span> /&gt;<br><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;btn&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;clickBtn()&quot;</span>&gt;</span>自定义上传<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span><br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">clickBtn</span>(<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;uploadBtn&quot;</span>).click();<br>&#125;<br><br><span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">_this</span>) </span>&#123;<br>    <span class="hljs-built_in">console</span>.log(_this.target.files[<span class="hljs-number">0</span>]);<br>&#125;);<br></code></pre></td></tr></table></figure><p><img src="/2021/10/28/js/buttonForUpload/1.jpg"></p><p>这里需要注意一点是：从本地上传文件时，为了安全考虑JavaScript默认是不允许直接读取本地文件，所以得需要<font color="red">URL.createObjectURL</font>获取当前文件的内存URL</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">window</span>.URL.createObjectURL(<span class="hljs-keyword">new</span> Blob([file]));<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>javascript</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>javascript</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Event Loop 事件循环</title>
+    <link href="/2021/10/25/js/EventLoop/"/>
+    <url>/2021/10/25/js/EventLoop/</url>
+    
+    <content type="html"><![CDATA[<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4><p>事件是可以被Javascript侦测到的行为，通俗的讲就是当用户与Web页面进行某些交互时，解释器就会创建响应的event对象以描述事件信息。<br></p><p>JavaScript 是一门 单线程 语言，即同一时间只能执行一个任务，即代码执行是同步并且阻塞的。<br></p><h4 id="任务队列-（task-queue）"><a href="#任务队列-（task-queue）" class="headerlink" title="任务队列 （task queue）"></a>任务队列 （task queue）</h4><p>队列 是一种 FIFO(First In, First Out) 的数据结构，它的特点就是 先进先出。</p><h4 id="栈-（Stack）"><a href="#栈-（Stack）" class="headerlink" title="栈 （Stack）"></a>栈 （Stack）</h4><p>栈 是一种 LIFO（Last In, First Out）的数据结构，特点即 后进先出。</p><h4 id="调用栈-（Call-Stack）"><a href="#调用栈-（Call-Stack）" class="headerlink" title="调用栈 （Call Stack）"></a>调用栈 （Call Stack）</h4><p>js的事件执行栈就是先进后出，最底层是全局，从上到下读取js，遇到事件就会将其推入栈顶，执行完毕后再推出栈。<br></p><p>由于js单线程同步执行，当我们需要发起了一个网络请求，或者设置了一个定时器延时，就会需要一个异步的队列来储存。因此，就会有宏任务（队列）和微任务（队列）。</p><h3 id="宏任务和微任务"><a href="#宏任务和微任务" class="headerlink" title="宏任务和微任务"></a>宏任务和微任务</h3><h4 id="宏任务"><a href="#宏任务" class="headerlink" title="宏任务"></a>宏任务</h4><p>每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）。浏览器为了能够使得JS内部(macro)task与DOM任务能够有序的执行，会在一个宏任务执行结束后，<font color="red">在下一个宏任务执行开始前，对页面进行重新渲染。</font><br></p><p>宏任务包含：<br></p><ul><li>script(整体代码)<br></li><li>setTimeout<br></li><li>setInterval<br></li><li>I/O<br></li><li>UI交互事件<br></li><li>postMessage<br></li><li>MessageChannel<br></li><li>setImmediate(Node.js 环境)<br></li></ul><h4 id="微任务"><a href="#微任务" class="headerlink" title="微任务"></a>微任务</h4><p>在当前 task 执行结束后立即执行的任务。也就是说，在当前task任务后，下一个task之前，在渲染之前。所以它的响应速度相比宏任务会更快，因为<font color="red">无需等待渲染</font>。也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）。</p><p>微任务包含：<br></p><ul><li>Promise.then<br></li><li>Object.observe<br></li><li>MutationObserver<br></li><li>process.nextTick(Node.js 环境)<br></li></ul><h4 id="暂存"><a href="#暂存" class="headerlink" title="暂存"></a>暂存</h4><p>后面有些深入的概念还没想好怎么写，大概是事件与动画相互之间的影响之类的，所以这篇文章先暂时写到这。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>javascript</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>javascript</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>面试中可能会问关于useEffect的一个小考点</title>
+    <link href="/2021/09/27/react/reactUseEffectReturn/"/>
+    <url>/2021/09/27/react/reactUseEffectReturn/</url>
+    
+    <content type="html"><![CDATA[<p>在react useEffect中，我们都知道的是：<br>&emsp;&emsp;1.第二个参数是用来监听变量变化后才选择是否执行该effect中方法的。<br>&emsp;&emsp;2.在什么都不监听（useEffect第二个参数为[]）的情况下，组件销毁时会执行return中的逻辑。  </p><p>那么，如果同时存在监听了变量和return方法时，useEffect会怎样执行里面的逻辑呢？</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 为了方便比较组件销毁，这里添加一个不监听变量的effect</span><br>useEffect(<span class="hljs-function">()=&gt;</span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-function">()=&gt;</span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;useEffect_[]执行了&quot;</span>);<br>    &#125;<br>&#125;,[]);<br><br>useEffect(<span class="hljs-function">()=&gt;</span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-function">()=&gt;</span>&#123;<br>        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;useEffect_count执行了&quot;</span>);<br>    &#125;<br>&#125;,[count]);<br></code></pre></td></tr></table></figure><p>首先，从字面意思上理解，当count发生变化后，会执行useEffect中的代码。当组件销毁时不监听变量的effect毫无疑问的会执行。而监听变量的effect也<font color="red">同样会执行return中的逻辑</font>。<br><img src="/2021/09/27/react/reactUseEffectReturn/1.jpg" alt="组件销毁时"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>React</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>React</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>React useModel之全局变量</title>
+    <link href="/2021/09/23/react/reactUseModel/"/>
+    <url>/2021/09/23/react/reactUseModel/</url>
+    
+    <content type="html"><![CDATA[<p>现如今，利用react+umi框架开发项目已成为主流，umi也出了很多非常好用的api和hooks。这篇文章打算来讲一下umi框架的全局变量useModal。</p><h4 id="useModel"><a href="#useModel" class="headerlink" title="useModel"></a>useModel</h4><p>首先，在项目src文件夹下的model文件夹中创建一个存放全局变量的文件。这里可以创建多个，根据文件名字即可引用到相应的全局文件。<br><img src="/2021/09/23/react/reactUseModel/1.jpg"></p><p>然后在文件中可以直接使用react hooks的方法。这里以useState为例</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; useState &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>;<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">globalFun</span>(<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-keyword">const</span> [count, setCount] = useState&lt;number&gt;(<span class="hljs-number">0</span>);<br><br>    <span class="hljs-keyword">return</span> &#123;<br>        count,<br>        setCount<br>    &#125;;<br>&#125;<br><br></code></pre></td></tr></table></figure><p>最后在需要使用到全局变量的文件中引入即可。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; useModel &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;umi&#x27;</span>;<br><br><span class="hljs-keyword">const</span> &#123;count, setCount&#125; = useModel(<span class="hljs-string">&quot;xxx&quot;</span>);  <span class="hljs-comment">// xxx处填入创建model文件的名字</span><br><br><span class="hljs-built_in">console</span>.log(count);<br><br><span class="hljs-keyword">return</span> (<br>    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">&#123;()</span>=&gt;</span>setCount(1)&#125;&gt;<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br>)<br></code></pre></td></tr></table></figure><h4 id="额外补充（函数式组件下的redux）"><a href="#额外补充（函数式组件下的redux）" class="headerlink" title="额外补充（函数式组件下的redux）"></a>额外补充（函数式组件下的redux）</h4><p>以前的react会将全局变量存在redux中，使得项目每次要引用全局变量时会调用redux的那一套方法（每个页面都要与store连接起来），这样写起来会增加一些麻烦，其次就是对于新手来说非常的不友好，这个可能是个人看法，我当初就是很久都没明白。后来随着函数式组件越来越火热，dva推出了useSelector，useDispatch方法来直接获取相应的存在redux中的值，这样使得函数式组件省去了connect那一系列的操作。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; useDispatch, useSelector &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;dva&#x27;</span>;<br><br><span class="hljs-comment">// useSelector</span><br><span class="hljs-keyword">const</span> &#123; userInfo &#125; = useSelector(<span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span> state.global);<br><br><span class="hljs-comment">// useDispatch</span><br><span class="hljs-keyword">const</span> dispatch = useDispatch();<br><br>dispatch(&#123;<br>    <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;global/save&#x27;</span>,<br>    <span class="hljs-attr">payload</span>: &#123;<br>        <span class="hljs-attr">userInfo</span>: &#123;<br>            <span class="hljs-attr">username</span>:<span class="hljs-string">&#x27;JabFury&#x27;</span><br>        &#125;,<br>    &#125;,<br>&#125;);<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>React</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>React</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>生活随笔 2021-9-12</title>
+    <link href="/2021/09/12/life/life-2021-9-12/"/>
+    <url>/2021/09/12/life/life-2021-9-12/</url>
+    
+    <content type="html"><![CDATA[<p>每个时期会有不同的认知。但是有些东西确实没有必要被以过来者的角度提前告知，必须要亲身经历后才会慢慢形成认知。就像无论怎么给小孩子说挣钱来之不易他也不会完全明白那个点，因为根本就没有那个概念。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>life</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>life</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>React useMemo 对于DOM的控制</title>
+    <link href="/2021/09/10/react/reactUseMemoToDom/"/>
+    <url>/2021/09/10/react/reactUseMemoToDom/</url>
+    
+    <content type="html"><![CDATA[<p>今天在一次交流DOM的会上发现，useMemo能对避免DOM的多次渲染也有效。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs javascript"> &lt;WindowScroller<br>    scrollElement=&#123;<span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;#private-project&quot;</span>)&#125;<br>    ref=&#123;windowScroller&#125;<br>/&gt;<br></code></pre></td></tr></table></figure><p>这个组件会在页面变化时实时监听dom的高度，为了做实验，我们将其写成函数返回，以便于看到后台打印次数</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> dom = <span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;执行了&#x27;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;#private-project&quot;</span>);<br>&#125;;<br><br> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">WindowScroller</span></span></span><br><span class="hljs-tag"><span class="xml">    <span class="hljs-attr">scrollElement</span>=<span class="hljs-string">&#123;dom()&#125;</span></span></span><br><span class="hljs-tag"><span class="xml">    <span class="hljs-attr">ref</span>=<span class="hljs-string">&#123;windowScroller&#125;</span></span></span><br><span class="hljs-tag"><span class="xml">/&gt;</span></span><br></code></pre></td></tr></table></figure><p><img src="/2021/09/10/react/reactUseMemoToDom/1.jpg"></p><p>由于监听的dom是最外层父级的dom不需要变化，所以只需要一次加载。因此，这里可以直接用useMemo实现性能优化。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> dom = useMemo(<span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;执行了&#x27;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;#private-project&quot;</span>);<br>&#125;, []);<br><br> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">WindowScroller</span></span></span><br><span class="hljs-tag"><span class="xml">    <span class="hljs-attr">scrollElement</span>=<span class="hljs-string">&#123;dom&#125;</span></span></span><br><span class="hljs-tag"><span class="xml">    <span class="hljs-attr">ref</span>=<span class="hljs-string">&#123;windowScroller&#125;</span></span></span><br><span class="hljs-tag"><span class="xml">/&gt;</span></span><br></code></pre></td></tr></table></figure><p><img src="/2021/09/10/react/reactUseMemoToDom/2.jpg"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>React</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>React</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>生活随笔 2021-9-5</title>
+    <link href="/2021/09/05/life/life-2021-9-1/"/>
+    <url>/2021/09/05/life/life-2021-9-1/</url>
+    
+    <content type="html"><![CDATA[<p>生活版块上线，这个版块会持续介绍生活上的所见所闻，愿与各位一起分享酸甜苦辣~</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>life</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>life</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>基于Hexo搭建个人博客</title>
+    <link href="/2021/09/03/buildHexo/"/>
+    <url>/2021/09/03/buildHexo/</url>
+    
+    <content type="html"><![CDATA[<h3 id="搭建Hexo"><a href="#搭建Hexo" class="headerlink" title="搭建Hexo"></a>搭建Hexo</h3><h4 id="搭建前提"><a href="#搭建前提" class="headerlink" title="搭建前提"></a>搭建前提</h4><p>搭建前需要以下准备：</p><ul><li>安装<a href="https://nodejs.org/zh-cn/">Node.js</a></li><li>安装<a href="https://git-scm.com/">Git</a></li></ul><h4 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>npm install -g hexo-cli   <span class="hljs-comment">#安装Hexo脚手架</span><br><span class="hljs-variable">$ </span>hexo init         <span class="hljs-comment">#Hexo自动执行构建网站所需要的文件</span><br><span class="hljs-variable">$ </span>npm install       <span class="hljs-comment">#安装依赖包</span><br></code></pre></td></tr></table></figure><h4 id="运行Hexo"><a href="#运行Hexo" class="headerlink" title="运行Hexo"></a>运行Hexo</h4><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs verilog">$ hexo <span class="hljs-keyword">generate</span>     #生成静态页面 快捷方式hexo g<br>$ hexo server       #启动本地服务器 快捷方式hexo s<br></code></pre></td></tr></table></figure><p>然后访问<a href="http://localhost:4000就可以看到搭建好了的博客页面，第一篇Hello">http://localhost:4000就可以看到搭建好了的博客页面，第一篇Hello</a> World的文章在source/hello-world.md中。</p><h4 id="新建一个项目（一篇文章）"><a href="#新建一个项目（一篇文章）" class="headerlink" title="新建一个项目（一篇文章）"></a>新建一个项目（一篇文章）</h4><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs actionscript">$ hexo <span class="hljs-keyword">new</span> <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><h4 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h4><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs verilog">$ hexo <span class="hljs-keyword">generate</span><br>$ hexo server<br></code></pre></td></tr></table></figure><h3 id="Hexo关联Github"><a href="#Hexo关联Github" class="headerlink" title="Hexo关联Github"></a>Hexo关联Github</h3><h4 id="新建一个Github项目，项目名必须要以”用户名-github-io”来命名"><a href="#新建一个Github项目，项目名必须要以”用户名-github-io”来命名" class="headerlink" title="新建一个Github项目，项目名必须要以”用户名.github.io”来命名"></a>新建一个Github项目，项目名必须要以”用户名.github.io”来命名</h4><p><img src="/2021/09/03/buildHexo/2.png"></p><h4 id="生成密钥"><a href="#生成密钥" class="headerlink" title="生成密钥"></a>生成密钥</h4><p>先查看是否有ssh密钥</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">$ ls ~<span class="hljs-regexp">/. ssh/</span> <span class="hljs-comment">#检查本机已存在的ssh密钥</span><br></code></pre></td></tr></table></figure><p>没有则生成一个密钥文件,windows环境下，该文件夹在C:/Users/XXX/.ssh中，Linux在~/. ssh</p><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elixir"><span class="hljs-variable">$ </span>ssh-keygen -t rsa -C <span class="hljs-string">&quot;你的GitHub注册邮箱&quot;</span> <br></code></pre></td></tr></table></figure><p>生成成功后打开文件夹中的id_rsa.pub，将其内容全部复制到Github的Setting/SSH and GPG keys/中</p><p><img src="/2021/09/03/buildHexo/1.png"></p><h4 id="部署到Github"><a href="#部署到Github" class="headerlink" title="部署到Github"></a>部署到Github</h4><p>打开项目根目录下的_config.yml文件，将deploy中的repo参数改为项目配置的github的地址</p><p><img src="/2021/09/03/buildHexo/3.png"></p><p>终端安装一个部署插件：hexo-deployer-git</p><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">$ npm install hexo-deployer-git <span class="hljs-comment">--save</span><br></code></pre></td></tr></table></figure><p>安装完成后，执行命令重新打包一次并部署即可</p><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs verilog">$ hexo <span class="hljs-keyword">generate</span>     #生成静态页面 快捷方式hexo g<br>$ hexo deploy       #部署到Github上 快捷方式hexo d<br></code></pre></td></tr></table></figure><p>浏览器访问：https://你的用户名.github.io就能看到博客了。</p><h3 id="绑定域名"><a href="#绑定域名" class="headerlink" title="绑定域名"></a>绑定域名</h3><p>为了使网页看起来更加的高大上，我们可以买个域名，并将其绑定到项目中,当我们已经存在正常使用的域名后，打开域名控制台，在解析设置里配置如下两条记录<br><img src="/2021/09/03/buildHexo/4.png"><br>在github.io项目下设置custom domain,最终能看到“Your site is published at xxx.com”即可<br><img src="/2021/09/03/buildHexo/5.png"><br>最后，在构建好的public文件夹中创建一个CNAME文件，将域名写入其中即可，这里需要注意的是：每次执行hexo clean后，会将整个public清除，因此每次清楚后重新构建时需要注意重新添加。因此，可以直接推到github仓库里。<br><img src="/2021/09/03/buildHexo/6.png"></p><p>至此，整个博客就能搭建完成了。整体来说还是比较简单，而且在构建时遇到的问题基本没有，有的话一般重新跑一遍构建就能解决。文章是用md来写，对于排版规范而言可能一开始没有了解很深，后续研究后加以改善。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>other</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>other</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>个人博客上线</title>
+    <link href="/2021/09/03/hello/"/>
+    <url>/2021/09/03/hello/</url>
+    
+    <content type="html"><![CDATA[<p>时隔1年半，个人博客又上线了，之前用学生证买的便宜服务器到期就再没续费了。无意间了解到hexo就打算来玩一下，结果发现这个东西简单又免费就能搭建出个人博客，而且还能跟域名绑定简直香到爆啊。准备第一篇文章来介绍一下怎么用hexo吧（由于文章数量不断累积，它被压到了最底部）。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>life</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
