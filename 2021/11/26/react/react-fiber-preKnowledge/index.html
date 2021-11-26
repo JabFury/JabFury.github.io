@@ -18,20 +18,23 @@
   <meta name="description" content="前端攻城狮，base成都">
   <meta name="author" content="JabFury">
   <meta name="keywords" content="">
-  <meta name="description" content="我本将心向明月，奈何明月喂了狗，真是够可悲的">
+  <meta name="description" content="前言这篇文章讲一下 react-fiber 的基本原理。会涉及到一些浏览器的机制，以及 react 与浏览器通信的小知识。现如今，浏览器的刷新帧率基本都是 1 秒 60 帧，即：1 帧 &#x3D; 1000ms &#x2F; 60 ≈ 16.6ms。而在每一帧中，浏览器会做以下几件事：  接受输入事件：阻塞输入事件（touch，wheel）和非阻塞事件（click，keypress）等 执行事件回调 （JavaSc">
 <meta property="og:type" content="article">
-<meta property="og:title" content="生活随笔 2021-11-11">
-<meta property="og:url" content="https://jabfury.github.io/2021/11/11/life/life-2021-11-11/index.html">
+<meta property="og:title" content="react-fiber-前置知识">
+<meta property="og:url" content="https://jabfury.github.io/2021/11/26/react/react-fiber-preKnowledge/index.html">
 <meta property="og:site_name" content="JabFury">
-<meta property="og:description" content="我本将心向明月，奈何明月喂了狗，真是够可悲的">
+<meta property="og:description" content="前言这篇文章讲一下 react-fiber 的基本原理。会涉及到一些浏览器的机制，以及 react 与浏览器通信的小知识。现如今，浏览器的刷新帧率基本都是 1 秒 60 帧，即：1 帧 &#x3D; 1000ms &#x2F; 60 ≈ 16.6ms。而在每一帧中，浏览器会做以下几件事：  接受输入事件：阻塞输入事件（touch，wheel）和非阻塞事件（click，keypress）等 执行事件回调 （JavaSc">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-11-11T15:44:39.000Z">
-<meta property="article:modified_time" content="2021-11-26T09:22:49.873Z">
+<meta property="og:image" content="https://jabfury.github.io/2021/11/26/react/react-fiber-preKnowledge/1.png">
+<meta property="og:image" content="https://jabfury.github.io/2021/11/26/react/react-fiber-preKnowledge/2.png">
+<meta property="article:published_time" content="2021-11-26T07:28:14.000Z">
+<meta property="article:modified_time" content="2021-11-26T09:20:07.055Z">
 <meta property="article:author" content="JabFury">
-<meta property="article:tag" content="life">
+<meta property="article:tag" content="React">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jabfury.github.io/2021/11/26/react/react-fiber-preKnowledge/1.png">
   
-  <title>生活随笔 2021-11-11 - JabFury</title>
+  <title>react-fiber-前置知识 - JabFury</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -177,7 +180,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="生活随笔 2021-11-11">
+            <span class="h2" id="subtitle" title="react-fiber-前置知识">
               
             </span>
 
@@ -187,8 +190,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-11-11 23:44" pubdate>
-        2021年11月11日 晚上
+      <time datetime="2021-11-26 15:28" pubdate>
+        2021年11月26日 下午
       </time>
     </span>
   
@@ -198,7 +201,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      22 字
+      696 字
     </span>
   
 
@@ -207,7 +210,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1 分钟
+      2 分钟
     </span>
   
 
@@ -244,10 +247,31 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">生活随笔 2021-11-11</h1>
+            <h1 style="display: none">react-fiber-前置知识</h1>
             
             <div class="markdown-body">
-              <p>我本将心向明月，奈何明月喂了狗，真是够可悲的</p>
+              <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这篇文章讲一下 react-fiber 的基本原理。会涉及到一些浏览器的机制，以及 react 与浏览器通信的小知识。<br><br><br>现如今，浏览器的刷新帧率基本都是 1 秒 60 帧，即：1 帧 = 1000ms / 60 ≈ 16.6ms。而在每一帧中，浏览器会做以下几件事：<br><img src="/2021/11/26/react/react-fiber-preKnowledge/1.png" srcset="/img/loading.gif" lazyload></p>
+<ol>
+<li>接受输入事件：阻塞输入事件（touch，wheel）和非阻塞事件（click，keypress）等</li>
+<li>执行事件回调 （JavaScript）</li>
+<li>开始一帧</li>
+<li>执行 RAF（RequestAnimationFrame）</li>
+<li>计算样式，页面布局 （layout）</li>
+<li>绘制渲染（paint）</li>
+<li>空闲时间（可用 requestIdleCallback 申请时间片）</li>
+</ol>
+<p>其中，前六个任务执行的时间一般约为 6ms 左右，意思就是浏览器平均每一帧大约能够留下 10ms 的时间为空余时间。而 react 正是利用每一帧的空余时间，来执行自己的任务。</p>
+<ul>
+<li>如果执行完一个任务后还有空余的时间且还有任务，则会继续执行。</li>
+<li>如果没有空余时间,则会将控制权交还给浏览器，使其进行下一帧任务。<br>依次循环。<br><img src="/2021/11/26/react/react-fiber-preKnowledge/2.png" srcset="/img/loading.gif" lazyload></li>
+</ul>
+<!-- react利用requestIdleCallback()  申请时间片 -->
+
+<p>在每一帧的活动中，申请到的时间片为浏览器每一帧任务剩余的时（约 10ms），<br>当浏览器不需要执行任务（1-6）时，浏览器会将 50ms 左右的时间分给申请的时间片里，<br>以此达到尽快完成任务。<br>这里浏览器分配 50ms 的原因是：<br></p>
+<ul>
+<li>浏览器默认认为：100ms 延迟内用户感觉是流畅的，浏览器会在空余时间分配 1 秒 20 帧，即 1000 / 20 = 50ms。</li>
+</ul>
+<p>react 会模拟 messageChannel 方法来与浏览器实现通信。从而达到申请调度到浏览器每一帧的空余时间<br>postMesage()（宏任务）在重绘之后进行，正好应证了 eventLoop 重绘之后浏览器进入空余时间。</p>
 
             </div>
             <hr>
@@ -257,7 +281,7 @@
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/life/">life</a>
+                      <a class="hover-with-bg" href="/categories/React/">React</a>
                     
                   </div>
                 
@@ -265,7 +289,7 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/life/">life</a>
+                      <a class="hover-with-bg" href="/tags/React/">React</a>
                     
                   </div>
                 
@@ -277,6 +301,23 @@
                   
                 </p>
               
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/28/js/buttonForUpload/">
+                        <span class="hidden-mobile">自定义上传</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 

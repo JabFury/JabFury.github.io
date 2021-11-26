@@ -4,23 +4,23 @@
   
   
   <entry>
-    <title>生活随笔 2021-11-11</title>
-    <link href="/2021/11/11/life/life-2021-11-11/"/>
-    <url>/2021/11/11/life/life-2021-11-11/</url>
+    <title>react-fiber-前置知识</title>
+    <link href="/2021/11/26/react/react-fiber-preKnowledge/"/>
+    <url>/2021/11/26/react/react-fiber-preKnowledge/</url>
     
-    <content type="html"><![CDATA[<p>我本将心向明月，奈何明月喂了狗，真是够可悲的</p>]]></content>
+    <content type="html"><![CDATA[<h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这篇文章讲一下 react-fiber 的基本原理。会涉及到一些浏览器的机制，以及 react 与浏览器通信的小知识。<br><br><br>现如今，浏览器的刷新帧率基本都是 1 秒 60 帧，即：1 帧 = 1000ms / 60 ≈ 16.6ms。而在每一帧中，浏览器会做以下几件事：<br><img src="/2021/11/26/react/react-fiber-preKnowledge/1.png"></p><ol><li>接受输入事件：阻塞输入事件（touch，wheel）和非阻塞事件（click，keypress）等</li><li>执行事件回调 （JavaScript）</li><li>开始一帧</li><li>执行 RAF（RequestAnimationFrame）</li><li>计算样式，页面布局 （layout）</li><li>绘制渲染（paint）</li><li>空闲时间（可用 requestIdleCallback 申请时间片）</li></ol><p>其中，前六个任务执行的时间一般约为 6ms 左右，意思就是浏览器平均每一帧大约能够留下 10ms 的时间为空余时间。而 react 正是利用每一帧的空余时间，来执行自己的任务。</p><ul><li>如果执行完一个任务后还有空余的时间且还有任务，则会继续执行。</li><li>如果没有空余时间,则会将控制权交还给浏览器，使其进行下一帧任务。<br>依次循环。<br><img src="/2021/11/26/react/react-fiber-preKnowledge/2.png"></li></ul><!-- react利用requestIdleCallback()  申请时间片 --><p>在每一帧的活动中，申请到的时间片为浏览器每一帧任务剩余的时（约 10ms），<br>当浏览器不需要执行任务（1-6）时，浏览器会将 50ms 左右的时间分给申请的时间片里，<br>以此达到尽快完成任务。<br>这里浏览器分配 50ms 的原因是：<br></p><ul><li>浏览器默认认为：100ms 延迟内用户感觉是流畅的，浏览器会在空余时间分配 1 秒 20 帧，即 1000 / 20 = 50ms。</li></ul><p>react 会模拟 messageChannel 方法来与浏览器实现通信。从而达到申请调度到浏览器每一帧的空余时间<br>postMesage()（宏任务）在重绘之后进行，正好应证了 eventLoop 重绘之后浏览器进入空余时间。</p>]]></content>
     
     
     <categories>
       
-      <category>life</category>
+      <category>React</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>life</tag>
+      <tag>React</tag>
       
     </tags>
     
