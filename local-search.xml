@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>JavaScript中利用对象字面量创建对象原型属性的影响</title>
+    <link href="/2021/12/06/js/createPrototypeByObject/"/>
+    <url>/2021/12/06/js/createPrototypeByObject/</url>
+    
+    <content type="html"><![CDATA[<p>众所周知，在 JavaScript 中，每个对象都有原型，在每个原型对象中都有一个 constructor 属性，指向对象本身。当我们在一个对象的原型上定义方法时，通常会这么做：</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Person</span>(<span class="hljs-params">name, age</span>) </span>&#123;<br>  <span class="hljs-built_in">this</span>.name = name;<br>  <span class="hljs-built_in">this</span>.age = age;<br>&#125;<br><br>Person.prototype.sayHi = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;hello&quot;</span>);<br>&#125;;<br><br><span class="hljs-keyword">const</span> p1 = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">&quot;Remilia&quot;</span>, <span class="hljs-number">23</span>);<br><br><span class="hljs-built_in">console</span>.log(p1);<br></code></pre></td></tr></table></figure><p><img src="/2021/12/06/js/createPrototypeByObject/0.jpg"><br>当我们打印该实例对象会发现，在其 prototype 中，除了有其定义的方法，还有指向自己的 contructor 属性。<br><br>如果我们使用对象字面量的形式去为一个原型对象增加属性的时候，会发生什么呢？</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs javascript">Person.prototype = &#123;<br>  <span class="hljs-attr">sayHi</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;hello&quot;</span>);<br>  &#125;,<br>  <span class="hljs-attr">sayBye</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;goodbye&quot;</span>);<br>  &#125;,<br>&#125;;<br><br><span class="hljs-built_in">console</span>.log(Person.prototype);<br></code></pre></td></tr></table></figure><p><img src="/2021/12/06/js/createPrototypeByObject/1.jpg"><br>现在整个 prototype 中只有两个定义的方法，没有 contructor 了，原因是：当我们以对象字面量的形式定义方法后，js 默认会将整个原型对象重新赋值，因此这里的 prototype 被新的对象字面量赋值从而丢失了能指向自己对象的 contructor。<br><br>如果我们既想以对象字面量的形式定义原型对象，又想使其与原本的对象关联起来。那么就需要在对象字面量中自己手动定义 constructor 方法并且与原有的对象关联即可。</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript">Person.prototype = &#123;<br>  <span class="hljs-attr">constructor</span>: Person,<br>  <span class="hljs-attr">sayHi</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;hello&quot;</span>);<br>  &#125;,<br>  <span class="hljs-attr">sayBye</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>&#123;<br>    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;goodbye&quot;</span>);<br>  &#125;,<br>&#125;;<br><br><span class="hljs-built_in">console</span>.log(Person.prototype);<br></code></pre></td></tr></table></figure><p><img src="/2021/12/06/js/createPrototypeByObject/2.jpg"></p><h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>以对象字面量的形式定义对象的原型属性在实际开发过程中相对来说是比较普遍的，印象定义起来比较方便也很直观，因此这里会存在一个隐形的小坑，报错时很大可能不容易发现。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>javascript</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>javascript</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>react-fiber-前置知识</title>
     <link href="/2021/11/26/react/react-fiber-preKnowledge/"/>
     <url>/2021/11/26/react/react-fiber-preKnowledge/</url>
