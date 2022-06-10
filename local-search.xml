@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>关于setTimeout的一个机制</title>
+    <link href="/2022/06/10/js/setTimeoutProcessed/"/>
+    <url>/2022/06/10/js/setTimeoutProcessed/</url>
+    
+    <content type="html"><![CDATA[<p>在 JavaScript 中，setTimeout 是一种宏观任务，而宏观任务的数据结构是队列，它的特点就是 先进先出。</p><p><font color="red">但是，浏览器会根据时间线程来控制队列的执行的顺序。</font></p><p>例如：</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;任务1&quot;</span>);<br>&#125;, <span class="hljs-number">1000</span>);<br><br><span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;任务2&quot;</span>);<br>&#125;);<br></code></pre></td></tr></table></figure><p>执行结果：<br><img src="/2022/06/10/js/setTimeoutProcessed/1.jpg"></p><p>上述代码执行顺序：</p><ol><li>执行任务 2</li><li>1 秒后执行任务 1<br></li></ol><p>由此我们可得，遇到 setTimeout，先把里面的函数放在浏览器的定时间线程里，等时间到了，浏览器会把对应的函数再加到当前程序执行的队列里。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>javascript</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>javascript</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>JavaScript中利用对象字面量创建对象原型属性的影响</title>
     <link href="/2021/12/06/js/createPrototypeByObject/"/>
     <url>/2021/12/06/js/createPrototypeByObject/</url>
