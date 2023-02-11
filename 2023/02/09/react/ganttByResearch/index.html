@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="前端攻城狮，base成都">
+  <meta name="author" content="JabFury">
+  <meta name="keywords" content="">
+  <meta name="description" content="前言根据业务要求，需要做一个根据任务周期来统计人员任务量的功能。需要能够清晰的展示人员与工作量的安排情况，以便每个项目组或者部门 leader 方便安排人手及工作，界面展示如下： 要求 有人员列表，并且人员列表下有其对应的任务及相关信息 拥有检索，查询功能 在人员行显示工作任务的数量，并显示在相对应的日期上（根据颜色不同反应出人员工作的任务量是正常或是积压） 在事项行上显示相对应的任务周期 点击人">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于frappe-gantt开发自定义扩展的甘特图业务">
+<meta property="og:url" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/index.html">
+<meta property="og:site_name" content="JabFury">
+<meta property="og:description" content="前言根据业务要求，需要做一个根据任务周期来统计人员任务量的功能。需要能够清晰的展示人员与工作量的安排情况，以便每个项目组或者部门 leader 方便安排人手及工作，界面展示如下： 要求 有人员列表，并且人员列表下有其对应的任务及相关信息 拥有检索，查询功能 在人员行显示工作任务的数量，并显示在相对应的日期上（根据颜色不同反应出人员工作的任务量是正常或是积压） 在事项行上显示相对应的任务周期 点击人">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/1.gif">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/2.jpg">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/3.jpg">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/4.jpg">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/5.jpg">
+<meta property="og:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/6.jpg">
+<meta property="article:published_time" content="2023-02-09T11:49:18.000Z">
+<meta property="article:modified_time" content="2023-02-11T08:23:40.188Z">
+<meta property="article:author" content="JabFury">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jabfury.github.io/2023/02/09/react/ganttByResearch/1.gif">
+  
+  <title>基于frappe-gantt开发自定义扩展的甘特图业务 - JabFury</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"jabfury.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Jab Fury</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="基于frappe-gantt开发自定义扩展的甘特图业务">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-02-09 19:49" pubdate>
+        2023年2月9日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        已阅读 <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">基于frappe-gantt开发自定义扩展的甘特图业务</h1>
+            
+            <div class="markdown-body">
+              <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>根据业务要求，需要做一个根据任务周期来统计人员任务量的功能。需要能够清晰的展示人员与工作量的安排情况，以便每个项目组或者部门 leader 方便安排人手及工作，界面展示如下：<br><img src="/2023/02/09/react/ganttByResearch/1.gif" srcset="/img/loading.gif" lazyload></p>
+<h2 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h2><ol>
+<li>有人员列表，并且人员列表下有其对应的任务及相关信息</li>
+<li>拥有检索，查询功能</li>
+<li>在人员行显示工作任务的数量，并显示在相对应的日期上（根据颜色不同反应出人员工作的任务量是正常或是积压）</li>
+<li>在事项行上显示相对应的任务周期</li>
+<li>点击人员工作任务显示详情弹窗</li>
+<li>点击事项任务显示任务详情弹窗</li>
+<li>点击事项行显示事项详情弹窗</li>
+</ol>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="组件选择"><a href="#组件选择" class="headerlink" title="组件选择"></a>组件选择</h3><p>首先我们需要的是一个传统的 crud 的功能，顶部是筛选的表单组件，左边的列表我选择的是 antd 的 table 组件，原因是 antd 的 table 组件可以直接支持树结构的数据。</p>
+<p>调研了几个甘特图的组件，最终选择了 frappe-gantt，选择原因是其非常的轻量，性能高，由于不需要甘特图组件之间的线，以及里程碑之类的功能，所以没必要选择功能性很庞大的组件避免提高浏览器的负荷。</p>
+<h3 id="评审功能"><a href="#评审功能" class="headerlink" title="评审功能"></a>评审功能</h3><p>传统甘特图都是一条数据对应一条甘特图的进度条，而本次功能要求是在筛选出的时间范围内展示出所有的任务进度条，所以需要对组件进行源码改造，实现方案是根据任务的时间段返回相对应的分段进度条，然后拼接起来行成完成的进度条，即渲染进度条字段的返回数据类型必须是数组类型，跟后端沟通后，字段格式如下图：<br><img src="/2023/02/09/react/ganttByResearch/2.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>children 字段存放的是这个成员在筛选出的时间范围内的任务数量，由于任务只存在一个进度条，故直接定义对象存储即可，除了需要的数据字段，必有的是 start、end 字段，代表的是进度条的起止时间，组件也是通过这两个字段渲染图表的。</p>
+<p>ganttList 字段代表的是这个成员在筛选出的时间范围内的时间进度条，根据每一项的 start、end 字段进行渲染，这个字段只会存在每一个成员的字段下。</p>
+<p>其他字段是用于展示任务数量，完成情况，任务类型，优先级，名称等。</p>
+<h2 id="开发功能"><a href="#开发功能" class="headerlink" title="开发功能"></a>开发功能</h2><h3 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h3><p>表格组件根据 antd 的文档开发即可，这里我们是将表格封装成了组件，cb 方法返回了调取接口后的数据。当获取到了接口返回的信息后，先注册甘特图的图表，如果存在了数据，就调用甘特图刷新的方法。这里自己定义了甘特图与 table 每行的高度保持一致。<br><img src="/2023/02/09/react/ganttByResearch/3.jpg" srcset="/img/loading.gif" lazyload alt="注册及刷新甘特图组件"></p>
+<p>在 onRow 属性里面定义了表格的 data 属性，将值存入，用于 expand 方法里，遍历每行属性，生成最新的甘特图的值，然后调用刷新方法，同时重新计算甘特图的高度，这样就能保证每条数据都保持一致。<br><img src="/2023/02/09/react/ganttByResearch/4.jpg" srcset="/img/loading.gif" lazyload alt="onRow属性"><br><img src="/2023/02/09/react/ganttByResearch/5.jpg" srcset="/img/loading.gif" lazyload alt="onExpandedRowsChange属性"></p>
+<h4 id="计算高度"><a href="#计算高度" class="headerlink" title="计算高度"></a>计算高度</h4><p>计算高度的原理很简单，由于 table 每一行都和甘特图的一一对应，因此我们只需要获取到 table 的高度，就能定义甘特图的高度。需要注意的是如果出现数据为空时，这里的操作是让图标高度展示为 0，而不是销毁组件，因为在获取数据的回调中，set 最新的 list 那一事件循环还未结束，组件就被销毁了因此会直接报错，同时为了不重新再次定义图表，这里将图表的高度设置成 0，并展示出空数据组件即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> changeGanttHeight = <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-keyword">let</span> ganttSvg = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;#gantt&quot;</span>);<br>  <span class="hljs-keyword">let</span> table = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">&quot;#table&quot;</span> + <span class="hljs-string">&quot; .ant-table&quot;</span>);<br>  <span class="hljs-keyword">const</span> _height = datas.current?.length === <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : table?.clientHeight + <span class="hljs-string">&quot;px&quot;</span>;<br>  ganttSvg?.setAttribute(<span class="hljs-string">&quot;style&quot;</span>, <span class="hljs-string">&quot;height: &quot;</span> + _height);<br><br>  <span class="hljs-comment">//调整图表高度时隐藏点击的弹框</span><br>  gantt.current?.hide_popup();<br><br>  <span class="hljs-keyword">const</span> _ganttContainerDom = <span class="hljs-built_in">document</span>?.querySelector(<span class="hljs-string">&quot;.gantt-container&quot;</span>);<br>  <span class="hljs-keyword">if</span> (datas.current?.length === <span class="hljs-number">0</span>) &#123;<br>    _ganttContainerDom?.setAttribute(<br>      <span class="hljs-string">&quot;style&quot;</span>,<br>      <span class="hljs-string">&quot;min-height: 0 !important; overflow: hidden&quot;</span><br>    );<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    _ganttContainerDom?.setAttribute(<br>      <span class="hljs-string">&quot;style&quot;</span>,<br>      <span class="hljs-string">&quot;min-height: calc(100vh - 213px) !important;&quot;</span><br>    );<br>  &#125;<br>&#125;;<br><br><span class="hljs-comment">//不销毁图表，且数据为空时展示空组件</span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Col</span> <span class="hljs-attr">span</span>=<span class="hljs-string">&#123;17&#125;</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&#123;styles.gannt_page&#125;</span>&gt;</span></span><br><span class="xml">  <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;gantt&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span></span><br><span class="xml">  &#123;dataList?.length === 0 &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Empty</span> /&gt;</span>&#125;</span><br><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">Col</span>&gt;</span></span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="修改甘特图源码"><a href="#修改甘特图源码" class="headerlink" title="修改甘特图源码"></a>修改甘特图源码</h3><h4 id="修改-渲染数据"><a href="#修改-渲染数据" class="headerlink" title="修改 渲染数据"></a>修改 渲染数据</h4><p>源码中，图表并不是直接用外层传值进去的数据渲染的，而是将其数据重新封装了一层，当然有些字段也会随之而变，比如时间字段会转成相应的时间戳类型，也会将每层数据增加一层独立 id</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//如果有ganttList</span><br><span class="hljs-keyword">if</span> (((task || &#123;&#125;).ganttList || []).length &gt; <span class="hljs-number">0</span>) &#123;<br>  task.ganttList.map(<span class="hljs-function">(<span class="hljs-params">item</span>) =&gt;</span> &#123;<br>    item._start = date_utils.parse(item.start);<br>    item._end = date_utils.parse(item.end);<br>    <span class="hljs-comment">// make task invalid if duration too large</span><br>    <span class="hljs-keyword">if</span> (date_utils.diff(item._end, item._start, <span class="hljs-string">&quot;year&quot;</span>) &gt; <span class="hljs-number">10</span>) &#123;<br>      item.end = <span class="hljs-literal">null</span>;<br>    &#125;<br>    <span class="hljs-comment">// cache index</span><br>    item._index = i;<br>    <span class="hljs-comment">// if hours is not set, assume the last day is full day</span><br>    <span class="hljs-comment">// e.g: 2018-09-09 becomes 2018-09-09 23:59:59</span><br>    <span class="hljs-keyword">const</span> task_end_values = date_utils.get_date_values(item._end);<br>    <span class="hljs-keyword">if</span> (task_end_values.slice(<span class="hljs-number">3</span>).every(<span class="hljs-function">(<span class="hljs-params">d</span>) =&gt;</span> d === <span class="hljs-number">0</span>)) &#123;<br>      item._end = date_utils.add(item._end, <span class="hljs-number">24</span>, <span class="hljs-string">&quot;hour&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// invalid flag</span><br>    <span class="hljs-keyword">if</span> (!item.start || !item.end) &#123;<br>      item.invalid = <span class="hljs-literal">true</span>;<br>    &#125;<br>    <span class="hljs-comment">// uids</span><br>    <span class="hljs-keyword">if</span> (!item.id) &#123;<br>      item.id = generate_id(item);<br>    &#125;<br>  &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后生成的数据如下图：<br><img src="/2023/02/09/react/ganttByResearch/6.jpg" srcset="/img/loading.gif" lazyload alt="甘特图组件渲染出图表的数据"></p>
+<h4 id="修改-进度条组件"><a href="#修改-进度条组件" class="headerlink" title="修改 进度条组件"></a>修改 进度条组件</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//源码</span><br><span class="hljs-function"><span class="hljs-title">make_bars</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-built_in">this</span>.bars = <span class="hljs-built_in">this</span>.tasks.map(<span class="hljs-function"><span class="hljs-params">task</span> =&gt;</span> &#123;<br>            <span class="hljs-keyword">const</span> bar = <span class="hljs-keyword">new</span> Bar(<span class="hljs-built_in">this</span>, task);<br>            <span class="hljs-built_in">this</span>.layers.bar.appendChild(bar.group);<br>            <span class="hljs-keyword">return</span> bar;<br>        &#125;);<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>这是修改前的源码，我们能看到图表是根据数据量来生成相应的进度条，由此我们能得出，如果我们想要拼接的话，就要在一个进度条里包含多个进度条，最后再把这一个进度条画在 layers 上面。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//修改后</span><br><span class="hljs-function"><span class="hljs-title">make_bars</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-built_in">this</span>.bars = <span class="hljs-built_in">this</span>.tasks.map(<span class="hljs-function"><span class="hljs-params">task</span> =&gt;</span> &#123;<br>            <span class="hljs-keyword">const</span> _this = <span class="hljs-built_in">this</span>;<br>            <span class="hljs-keyword">let</span> bar = <span class="hljs-keyword">new</span> Bar(<span class="hljs-built_in">this</span>, task);<br>            <span class="hljs-built_in">this</span>.layers.bar.appendChild(bar.group);<br>            <span class="hljs-keyword">if</span> (((task || &#123;&#125;).ganttList || []).length &gt; <span class="hljs-number">0</span>) &#123;<br>                task.ganttList.forEach(<span class="hljs-function">(<span class="hljs-params">item</span>) =&gt;</span> &#123;<br>                    <span class="hljs-keyword">const</span> _childBar = <span class="hljs-keyword">new</span> Bar(_this, item);<br>                    bar.group.appendChild(_childBar.group);<br>                &#125;)<br>            &#125;<br>            <span class="hljs-keyword">return</span> bar;<br>        &#125;);<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="修改-弹框组件"><a href="#修改-弹框组件" class="headerlink" title="修改 弹框组件"></a>修改 弹框组件</h4><p>开发弹框组件的时候，主要遇到的两个大坑：</p>
+<ol>
+<li>点击展示弹框时，父容器也出现了弹框；</li>
+<li>由于弹框是个真实 dom，如果列表拉到最下面了，真实 dom 会将整个画布容器撑起来，出现一大片空白</li>
+</ol>
+<p>第一个问题一看就是需要取消冒泡，但是在 index 中很多地方是这样绑定的点击事件，开发的时候也被误导了</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//index.js</span><br><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">$</span>(<span class="hljs-params">expr, con</span>) </span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">typeof</span> expr === <span class="hljs-string">&#x27;string&#x27;</span><br>        ? (con || <span class="hljs-built_in">document</span>).querySelector(expr)<br>        : expr || <span class="hljs-literal">null</span>;<br>&#125;<br><br> $.on(<span class="hljs-built_in">this</span>.$svg, <span class="hljs-string">&#x27;mousedown&#x27;</span>, <span class="hljs-string">&#x27;.bar-wrapper, .handle&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e, element</span>) =&gt;</span> &#123;<br>            <span class="hljs-keyword">const</span> bar_wrapper = $.closest(<span class="hljs-string">&#x27;.bar-wrapper&#x27;</span>, element);<br>            <span class="hljs-comment">//......</span><br>            <span class="hljs-comment">//......</span><br> )<br></code></pre></td></tr></table></figure>
+
+<p>最后终于在定义进度条的文件中找到,并增加取消冒泡</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//bar.js</span><br><span class="hljs-function"><span class="hljs-title">bind</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.invalid) <span class="hljs-keyword">return</span>;<br>        <span class="hljs-built_in">this</span>.setup_click_event();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-title">setup_click_event</span>(<span class="hljs-params"></span>)</span> &#123;<br>        $.on(<span class="hljs-built_in">this</span>.group, <span class="hljs-string">&#x27;focus &#x27;</span> + <span class="hljs-built_in">this</span>.gantt.options.popup_trigger, <span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> &#123;<br>            <span class="hljs-comment">//去掉冒泡，防止点击子元素时父容器也弹出</span><br>            e &amp;&amp; e.stopPropagation();<br>            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.action_completed) &#123;<br>                <span class="hljs-comment">// just finished a move action, wait for a few seconds</span><br>                <span class="hljs-keyword">return</span>;<br>            &#125;<br><br>            <span class="hljs-built_in">this</span>.show_popup(&#123; <span class="hljs-attr">x</span>: e.offsetX, <span class="hljs-attr">y</span>: e.offsetY &#125;);<br>            <span class="hljs-built_in">this</span>.gantt.unselect_all();<br>            <span class="hljs-built_in">this</span>.group.classList.add(<span class="hljs-string">&#x27;active&#x27;</span>);<br>        &#125;);<br></code></pre></td></tr></table></figure>
+
+<p>第二个问题是在弹框文件中，默认定义的弹框都是展示在点击进度条的下方，为了使样式不出现混乱，最开始想过从进度条右边展示，但是一旦数据超过了 10 天或者并排多时，右边展示的弹框需要把进度条拖到相应位置才会展示，不美观因此废弃。还有一种是在画布上画出 svg 的弹框，这样的弊端在于不能自己定义弹框里的展示内容，模板一旦写好就不能扩展，因此也不是最佳选择。最后想到一个比较优质的解决方式就是，通过获取到容器高度以及进度条的 y 的坐标大小进行对比，判断出如果点击的是最底下的几条数据，那么就将弹框向上展示。</p>
+<p>首先，在点击进度条的事件里找到展示弹框的方法，并将其传入当前的坐标</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//bar.js</span><br><span class="hljs-built_in">this</span>.show_popup(&#123; <span class="hljs-attr">x</span>: e.offsetX, <span class="hljs-attr">y</span>: e.offsetY &#125;);<br><br><span class="hljs-function"><span class="hljs-title">show_popup</span>(<span class="hljs-params">clickedPosition</span>)</span> &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.gantt.bar_being_dragged) <span class="hljs-keyword">return</span>;<br><br>        <span class="hljs-keyword">const</span> start_date = date_utils.format(<span class="hljs-built_in">this</span>.task._start, <span class="hljs-string">&#x27;MMM D&#x27;</span>, <span class="hljs-built_in">this</span>.gantt.options.language);<br>        <span class="hljs-keyword">const</span> end_date = date_utils.format(<br>            date_utils.add(<span class="hljs-built_in">this</span>.task._end, -<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;second&#x27;</span>),<br>            <span class="hljs-string">&#x27;MMM D&#x27;</span>,<br>            <span class="hljs-built_in">this</span>.gantt.options.language<br>        );<br>        <span class="hljs-keyword">const</span> subtitle = start_date + <span class="hljs-string">&#x27; - &#x27;</span> + end_date;<br><br><span class="hljs-comment">//手动传入坐标</span><br>        <span class="hljs-built_in">this</span>.gantt.show_popup(&#123;<br>            <span class="hljs-attr">target_element</span>: <span class="hljs-built_in">this</span>.$bar,<br>            <span class="hljs-attr">title</span>: <span class="hljs-built_in">this</span>.task.name,<br>            <span class="hljs-attr">subtitle</span>: subtitle,<br>            <span class="hljs-attr">task</span>: <span class="hljs-built_in">this</span>.task,<br>            <span class="hljs-attr">group</span>: <span class="hljs-built_in">this</span>.group<br>        &#125;, clickedPosition);<br></code></pre></td></tr></table></figure>
+
+<p>index.js 中接收到坐标，传到弹框实例的方法中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//index.js</span><br><span class="hljs-function"><span class="hljs-title">show_popup</span>(<span class="hljs-params">options, clickedPosition</span>)</span> &#123;<br>        <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">this</span>.popup) &#123;<br>            <span class="hljs-built_in">this</span>.popup = <span class="hljs-keyword">new</span> Popup(<br>                <span class="hljs-built_in">this</span>.popup_wrapper,<br>                <span class="hljs-built_in">this</span>.options.custom_popup_html<br>            );<br>        &#125;<br>        <span class="hljs-built_in">this</span>.popup.show(options, clickedPosition);<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>在弹框文件中的 show 方法中定义弹框的位置</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">//popup.js</span><br><span class="hljs-function"><span class="hljs-title">show</span>(<span class="hljs-params">options, clickedPosition</span>)</span> &#123;<br><br><span class="hljs-comment">//......</span><br><br><span class="hljs-keyword">const</span> _ganttChartTotalHeight = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">&quot;gantt&quot;</span>).clientHeight;<br><span class="hljs-built_in">this</span>.parent.style.left = clickedPosition.x - <span class="hljs-number">115</span> + <span class="hljs-string">&quot;px&quot;</span>;<br><span class="hljs-comment">//如果y的坐标 &gt; 总高度-250，弹框向上展示</span><br><span class="hljs-keyword">if</span> (<br>  position_meta.y &gt; <span class="hljs-number">160</span> &amp;&amp;<br>  position_meta.y + <span class="hljs-number">30</span> &gt; _ganttChartTotalHeight - <span class="hljs-number">250</span><br>) &#123;<br>  <span class="hljs-keyword">const</span> isParent = options.task.issueCount &gt;= <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">this</span>.parent.style.top = position_meta.y - (isParent ? <span class="hljs-number">120</span> : <span class="hljs-number">200</span>) + <span class="hljs-string">&quot;px&quot;</span>;<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-built_in">this</span>.parent.style.top = position_meta.y + <span class="hljs-number">30</span> + <span class="hljs-string">&quot;px&quot;</span>;<br>&#125;<br><span class="hljs-built_in">this</span>.pointer.style.transform = <span class="hljs-string">&quot;rotateZ(90deg)&quot;</span>;<br><span class="hljs-built_in">this</span>.pointer.style.left = <span class="hljs-string">&quot;-7px&quot;</span>;<br><span class="hljs-built_in">this</span>.pointer.style.top = <span class="hljs-string">&quot;2px&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>其他还有一些别的优化，如图表上显示的年月日等，这些配置统一放到了 format 方法中，都能找得到。包括样式，在相对应的 css 的类中根据产品要求修改即可，至此，整个功能算是基本实现了。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/18/life/life-2022-7-18/">
+                        <span class="hidden-mobile">生活随笔 2022-7-18</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"N22yuH6OBSSBSrGHhitUbw6P-gzGzoHsz","appKey":"FE0FNv9i2DD3rWgnduniP099","path":"window.location.pathname","placeholder":"来一个有好的神评论~","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":true},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          Fluid.plugins.initFancyBox('#valine .vcontent img:not(.vemoji)');
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     Copyright © 2021 <i class="iconfont icon-love"></i> Jab Fury 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
